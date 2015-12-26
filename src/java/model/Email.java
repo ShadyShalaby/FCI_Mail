@@ -2,6 +2,7 @@
 package model;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 /**
  *
@@ -17,6 +18,7 @@ public class Email {
     private int replyID;
     private boolean isArchieved;
     private Date emailDateTime ; // to be checked
+    private ArrayList <Email> replies;
 
     public Email(int emailID, String sender, String receiver, String subject, String body, 
             int replyID, boolean isArchieved, Date emailDateTime) {
@@ -28,6 +30,7 @@ public class Email {
         this.replyID = replyID;
         this.isArchieved = isArchieved;
         this.emailDateTime = emailDateTime;
+        this.replies = new ArrayList<Email>();
     }
 
     public int getEmailID() {
@@ -94,6 +97,13 @@ public class Email {
         this.emailDateTime = emailDateTime;
     }
     
+    public ArrayList<Email> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(ArrayList<Email> replies) {
+        this.replies = replies;
+    }
     
 
 }

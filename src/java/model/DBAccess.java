@@ -31,7 +31,7 @@ public class DBAccess {
     }
 
     public boolean isValidUser(String userEmail, String password) throws SQLException {
-      
+
         Statement stmt = con.createStatement();
         ResultSet resultSet = stmt.executeQuery("SELECT * FROM User;");
 
@@ -70,10 +70,10 @@ public class DBAccess {
 
         ArrayList<Email> inbox = getUserInbox(userEmail);
         ArrayList<Email> archive = getUserArchive(userEmail);
-        
-        User user = new User(userEmail, name, password, country, 
-                 profilePic, inbox, archive);
-        
+
+        User user = new User(userEmail, name, password, country,
+                profilePic, inbox, archive);
+
         return user;
     }
 
@@ -122,6 +122,38 @@ public class DBAccess {
         stmt.close(); //release resources
 
         return archive;
+    }
+
+    /************************ BY Shady ****************************/
+    public Email getEmail(int EmailID) throws SQLException {
+
+        Statement stmt = con.createStatement();
+        String query = "SELECT * FROM Email WHERE emailID=" + EmailID + " OR ReplyID=" + EmailID;
+        Email email = null;
+        ArrayList<Email> emailReplies = new ArrayList<Email>();
+        ResultSet resultSet = stmt.executeQuery(query);
+
+        while (resultSet.next()) {
+            int emailID = resultSet.getInt("emailID");
+            String sender = resultSet.getString("sender");
+            String receiver = resultSet.getString("receiver");
+            String subject = resultSet.getString("subject");
+            String body = resultSet.getString("body");
+            int replyID = resultSet.getInt("replyID");
+            boolean isArchieved = resultSet.getBoolean("isArchieved");
+            Date emailDateTime = resultSet.getDate("emailDateTime");
+
+            if (emailID == EmailID) {
+                email = new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime);
+            } else {
+                emailReplies.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
+            }
+        }
+
+        email.setReplies(emailReplies);
+        resultSet.close();  //release resources
+        stmt.close();       //release resources
+        return email;
     }
 
 }
