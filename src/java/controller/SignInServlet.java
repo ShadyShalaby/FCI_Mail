@@ -58,6 +58,7 @@ public class SignInServlet extends HttpServlet {
                 User user = dbAccess.getUser(userEmail);
                 dbAccess.closeConnection();
                 session.setAttribute("user", user);
+                request.getSession().setAttribute("show", "inbox");
                 String url = "/view/pages/inbox.jsp";
                 response.sendRedirect(request.getContextPath() + url);
 

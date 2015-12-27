@@ -2,6 +2,7 @@
 package model;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -17,11 +18,11 @@ public class Email {
     private String body;
     private int replyID;
     private boolean isArchieved;
-    private Date emailDateTime ; // to be checked
+    private Timestamp emailDateTime ; // to be checked
     private ArrayList <Email> replies;
 
     public Email(int emailID, String sender, String receiver, String subject, String body, 
-            int replyID, boolean isArchieved, Date emailDateTime) {
+            int replyID, boolean isArchieved, Timestamp emailDateTime) {
         this.emailID = emailID;
         this.sender = sender;
         this.receiver = receiver;
@@ -89,11 +90,11 @@ public class Email {
         this.isArchieved = isArchieved;
     }
 
-    public Date getEmailDateTime() {
+    public Timestamp getEmailDateTime() {
         return emailDateTime;
     }
 
-    public void setEmailDateTime(Date emailDateTime) {
+    public void setEmailDateTime(Timestamp emailDateTime) {
         this.emailDateTime = emailDateTime;
     }
     

@@ -23,7 +23,7 @@ public class DBAccess {
         }
 
         con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/fci_mail",
-                "root", "root");
+                "root", "1234");
     }
 
     public void closeConnection() throws SQLException {
@@ -68,8 +68,10 @@ public class DBAccess {
         resultSet.close(); //release resources
         stmt.close(); //release resources
 
-        ArrayList<Email> inbox = getUserInbox(userEmail);
-        ArrayList<Email> archive = getUserArchive(userEmail);
+        ArrayList<Email> inbox = new ArrayList<>();
+        inbox.addAll(getUserInbox(userEmail));
+        ArrayList<Email> archive = new ArrayList<>();
+        archive.addAll(getUserArchive(userEmail));
 
         User user = new User(userEmail, name, password, country,
                 profilePic, inbox, archive);
@@ -77,12 +79,15 @@ public class DBAccess {
         return user;
     }
 
+    
     public ArrayList<Email> getUserInbox(String userEmail) throws SQLException {
         ArrayList<Email> inbox = new ArrayList<Email>();
         Statement stmt = con.createStatement();
         ResultSet resultSet = stmt.executeQuery("SELECT * FROM Email;");
         while (resultSet.next()) {
-            if (userEmail.equals(resultSet.getString("receiver")) && resultSet.getBoolean("isArchieved") == false) {
+            if (userEmail.equals(resultSet.getString("receiver"))
+                    && resultSet.getBoolean("isArchieved") == false) {
+
                 int emailID = resultSet.getInt("emailID");
                 String sender = resultSet.getString("sender");
                 String receiver = resultSet.getString("receiver");
@@ -90,8 +95,12 @@ public class DBAccess {
                 String body = resultSet.getString("body");
                 int replyID = resultSet.getInt("replyID");
                 boolean isArchieved = resultSet.getBoolean("isArchieved");
-                Date emailDateTime = resultSet.getDate("emailDateTime");
-                inbox.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
+                Timestamp emailDateTime = resultSet.getTimestamp("emailDateTime");
+                if (replyID == 0) {
+                    
+                    inbox.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
+                }
+
             }
         }
         resultSet.close(); //release resources
@@ -99,12 +108,13 @@ public class DBAccess {
 
         return inbox;
     }
-
+    
     public ArrayList<Email> getUserArchive(String userEmail) throws SQLException {
         ArrayList<Email> archive = new ArrayList<Email>();
         Statement stmt = con.createStatement();
         ResultSet resultSet = stmt.executeQuery("SELECT * FROM Email;");
         while (resultSet.next()) {
+
             if ((userEmail.equals(resultSet.getString("sender")) || userEmail.equals(resultSet.getString("receiver")))
                     && resultSet.getBoolean("isArchieved") == true) {
                 int emailID = resultSet.getInt("emailID");
@@ -114,8 +124,10 @@ public class DBAccess {
                 String body = resultSet.getString("body");
                 int replyID = resultSet.getInt("replyID");
                 boolean isArchieved = resultSet.getBoolean("isArchieved");
-                Date emailDateTime = resultSet.getDate("emailDateTime");
-                archive.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
+                Timestamp emailDateTime = resultSet.getTimestamp("emailDateTime");
+                if (replyID == 0) {
+                    archive.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
+                } 
             }
         }
         resultSet.close(); //release resources
@@ -124,11 +136,13 @@ public class DBAccess {
         return archive;
     }
 
+    
+    
     /************************ BY Shady ****************************/
     public Email getEmail(int EmailID) throws SQLException {
 
         Statement stmt = con.createStatement();
-        String query = "SELECT * FROM Email WHERE emailID=" + EmailID + " OR ReplyID=" + EmailID;
+        String query = "SELECT * FROM Email WHERE emailID=" + EmailID + " OR ReplyID=" + EmailID+";";
         Email email = null;
         ArrayList<Email> emailReplies = new ArrayList<Email>();
         ResultSet resultSet = stmt.executeQuery(query);
@@ -141,7 +155,7 @@ public class DBAccess {
             String body = resultSet.getString("body");
             int replyID = resultSet.getInt("replyID");
             boolean isArchieved = resultSet.getBoolean("isArchieved");
-            Date emailDateTime = resultSet.getDate("emailDateTime");
+            Timestamp emailDateTime = resultSet.getTimestamp("emailDateTime");
 
             if (emailID == EmailID) {
                 email = new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime);
