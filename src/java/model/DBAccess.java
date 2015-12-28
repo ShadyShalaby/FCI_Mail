@@ -124,7 +124,9 @@ public class DBAccess {
         return archive;
     }
 
-    /************************ BY Shady ****************************/
+    /**
+     * ********************** BY Shady ***************************
+     */
     public Email getEmail(int EmailID) throws SQLException {
 
         Statement stmt = con.createStatement();
@@ -154,6 +156,21 @@ public class DBAccess {
         resultSet.close();  //release resources
         stmt.close();       //release resources
         return email;
+    }
+
+    /**
+     * ********************** BY Shady ***************************
+     */
+    public int addReply(Email email) throws SQLException {
+
+        Statement stmt = con.createStatement();
+        String query = "Insert into email (sender, receiver, subject, body, replyID, isArchieved, emailDateTime)"
+                + " values('" + email.getSender() + "' , '" + email.getReceiver() + "' , '" + email.getSubject() + "' , "
+                + "'" + email.getBody() + "' , " + email.getReplyID() + " , 0 , '2015-12-26 17:18:07')";
+
+        int affectedRows = stmt.executeUpdate(query);
+        stmt.close();       //release resources
+        return affectedRows;
     }
 
 }

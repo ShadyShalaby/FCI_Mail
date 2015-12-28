@@ -8,25 +8,23 @@ package controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import model.DBAccess;
 import model.Email;
-import model.User;
 
 /**
  *
  * @author Shady
  */
-@WebServlet(name = "ShowEmailServlet", urlPatterns = {"/ShowEmailServlet"})
-public class ShowEmailServlet extends HttpServlet {
+@WebServlet(name = "ReplyServlet", urlPatterns = {"/ReplyServlet"})
+public class ReplyServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,26 +35,28 @@ public class ShowEmailServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = null;
-        try {
-            out = response.getWriter();
-        } catch (IOException ex) {
-            Logger.getLogger(ShowEmailServlet.class.getName()).log(Level.SEVERE, null, ex);
+        try (PrintWriter out = response.getWriter()) {
+            
+            int replyID = Integer.parseInt(request.getParameter("basicID"));
+            String sender = request.getParameter("sender");
+            String reciever = request.getParameter("reciever");
+            String subject = request.getParameter("subject");
+            String body = request.getParameter("body");
+            
+            out.print(replyID + " " + sender + " " + reciever + " " + subject + " " + body);
+            
+            Email email = new Email(0, sender, reciever, subject, body, replyID, false, null);
+            DBAccess dbAccess = new DBAccess();
+            
+            dbAccess.addReply(email);
+            dbAccess.closeConnection();
+            
+            String url = "/view/pages/inbox.jsp";
+            response.sendRedirect( request.getContextPath() + url );
         }
-
-        HttpSession session = request.getSession(true);
-        User user = (User) session.getAttribute("user");
-        int emailID = Integer.parseInt(request.getParameter("id"));
-        DBAccess dbAccess = new DBAccess();
-        Email email = dbAccess.getEmail(emailID);
-        dbAccess.closeConnection();
-        
-        session.setAttribute("showEmail", email);
-        String url = "/view/pages/show_email.jsp";
-        response.sendRedirect(request.getContextPath() + url);
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -69,11 +69,12 @@ public class ShowEmailServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(ShowEmailServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ReplyServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -91,7 +92,7 @@ public class ShowEmailServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(ShowEmailServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ReplyServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

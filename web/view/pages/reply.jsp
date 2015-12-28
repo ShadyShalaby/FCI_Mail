@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <title>Sign Up Page</title>
+        <title>Reply</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -11,7 +11,7 @@
 
     </head>
     <body>
-        
+                
         <div class="container">
 
             <nav class="navbar ">
@@ -30,36 +30,39 @@
                 </div>
 
             </nav>
-
-
+  
             <div class="row">
-                <div class="col-md-3"></div>
-                <div class="col-md-3">
-                    <form class="form-signUp">
+         
+                <form class="form-signUp" action="../../ReplyServlet" method="post">
                         <h2 class="form-signin-heading" style="color:DodgerBlue">Reply Email</h2>
+
+                        <div>
+                            <input type="hidden" name="basicID" value="<%=request.getParameter("basicID")%>">
+                        </div>
+    
                         <div>
                             <label style="color:DodgerBlue">From: </label><br>
-                            <input type="text">
+                            <input type="text" name="sender" value="<%=request.getParameter("sender")%>" readonly>
                         </div>
                         
                         <div>
                             <label style="color:DodgerBlue">To: </label><br>
-                            <input type="text">
+                            <input type="text" name="reciever" value="<%=request.getParameter("reciever")%>" readonly>
                         </div>
                         
                         <div>
                             <label style="color:DodgerBlue">Subject: </label><br>
-                            <input type="text">
+                            <input type="text" name="subject" value="<%=request.getParameter("subject")%>" readonly>
                         </div>
                         
                         <div>
                              <label style="color:DodgerBlue">Message: </label><br>
-                             <textarea rows="10" cols="40"></textarea>
+                             <textarea name="body" rows="10" cols="40"></textarea>
                         </div>
                         <br>
                         <button  type="submit">Reply</button>
                     </form>  
-                </div>
+             
                 <div class="col-md-3"></div>
             </div>
             
