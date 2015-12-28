@@ -23,7 +23,7 @@ public class DBAccess {
         }
 
         con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/fci_mail",
-                "root", "1234");
+                "root", "root");
     }
 
     public void closeConnection() throws SQLException {
