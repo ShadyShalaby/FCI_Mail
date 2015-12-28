@@ -1,33 +1,29 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package controller;
-
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import static java.lang.System.out;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.jms.Session;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import model.DBAccess;
 import model.User;
 
 /**
  *
- * @author sabry_ragab
+ * @author Heba
  */
-@WebServlet(name = "SignInServlet", urlPatterns = {"/SignInServlet"})
-public class SignInServlet extends HttpServlet {
+@WebServlet(name = "ArchiveServlet", urlPatterns = {"/ArchiveServlet"})
+public class ArchiveServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,39 +37,17 @@ public class SignInServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-
         try (PrintWriter out = response.getWriter()) {
-
-            String userEmail = request.getParameter("userEmail");
-            String password = request.getParameter("password");
-
-            DBAccess dbAccess = new DBAccess();
-            // Create a session object if it is already not  created.
-            HttpSession session = request.getSession(true);
-             
-            if (dbAccess.isValidUser(userEmail, password) == true) { //correct data
-   
-                session.setAttribute("userEmail", userEmail);
-                session.setMaxInactiveInterval(60*60);// one hour
-                User user = dbAccess.getUser(userEmail);
-                dbAccess.closeConnection();
-                session.setAttribute("user", user);
-                request.getSession().setAttribute("show", "inbox");
-                String url = "/view/pages/inbox.jsp";
-                response.sendRedirect(request.getContextPath() + url);
-
-            } else {
-
-                dbAccess.closeConnection();
-                session.setAttribute("signinResult", "Incorrect Email or Password");
-                session.setAttribute("userEmail", userEmail);
-                session.setAttribute("password", password);
-                String url = "/view/pages/signin.jsp";
-                response.sendRedirect(request.getContextPath() + url);
-
-            }
+            /* TODO output your page here. You may use following sample code. */
+            User user = (User) request.getSession().getAttribute("user");
+            DBAccess database = new DBAccess();
+            user.setInbox(database.getUserInbox(user.getUserEmail()));
+            request.getSession().setAttribute("user", user);
+            request.getSession().setAttribute("show", "archive");
+            database.closeConnection();
+            String url = "/view/pages/inbox.jsp";
+            response.sendRedirect(request.getContextPath() + url);
         }
-
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -91,7 +65,7 @@ public class SignInServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(SignInServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ArchiveServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -109,7 +83,7 @@ public class SignInServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(SignInServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ArchiveServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -120,7 +94,7 @@ public class SignInServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "This servelt validate sigin Form";
+        return "Short description";
     }// </editor-fold>
 
 }

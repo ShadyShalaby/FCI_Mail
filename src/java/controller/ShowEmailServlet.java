@@ -46,13 +46,15 @@ public class ShowEmailServlet extends HttpServlet {
             Logger.getLogger(ShowEmailServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession();
+        
         User user = (User) session.getAttribute("user");
-        int emailID = Integer.parseInt(request.getParameter("id"));
+        int emailID = Integer.parseInt(request.getParameter("id"));      
+      
         DBAccess dbAccess = new DBAccess();
         Email email = dbAccess.getEmail(emailID);
         dbAccess.closeConnection();
-        
+
         session.setAttribute("showEmail", email);
         String url = "/view/pages/show_email.jsp";
         response.sendRedirect(request.getContextPath() + url);

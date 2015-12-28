@@ -43,6 +43,8 @@
                 out.print("<br>");
             }
             out.print("</table>");
+            out.print("<br>");
+            out.print("<br>");
 
             repSender = user.getUserEmail();
             if (email.getSender().equals(repSender)) {
@@ -66,7 +68,7 @@
         <!-- For Shrioo -->
         <form action="forword.jsp" method="post">
             <input type="hidden" name="id" value="<%=email.getEmailID()%>">
-            <input type="submit" name="submit" value="Reply">
+            <input type="submit" name="submit" value="Forword">
         </form>
 
 

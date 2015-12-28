@@ -25,8 +25,10 @@ public class User {
         this.password = password;
         this.country = country;
         this.profilePic = profilePic;
-        this.inbox = inbox;
-        this.archive = archive;
+        this.inbox = new ArrayList<>();
+        this.inbox.addAll(inbox);
+        this.archive = new ArrayList<>();
+        this.archive.addAll(archive);
     }
 
     public String getUserEmail() {
@@ -74,7 +76,8 @@ public class User {
     }
 
     public void setInbox(ArrayList<Email> inbox) {
-        this.inbox = inbox;
+        this.inbox = new ArrayList<>();
+        this.inbox.addAll(inbox);
     }
 
     public ArrayList<Email> getArchive() {
@@ -82,7 +85,8 @@ public class User {
     }
 
     public void setArchive(ArrayList<Email> archive) {
-        this.archive = archive;
+        this.archive = new ArrayList<>();
+        this.archive.addAll(archive);
     }
 
 }
