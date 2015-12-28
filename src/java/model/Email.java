@@ -17,12 +17,12 @@ public class Email {
     private String subject;
     private String body;
     private int replyID;
-    private boolean isArchieved;
-    private Timestamp emailDateTime ; // to be checked
+    private int isArchieved;
+    private Date emailDateTime ; // to be checked
     private ArrayList <Email> replies;
 
     public Email(int emailID, String sender, String receiver, String subject, String body, 
-            int replyID, boolean isArchieved, Timestamp emailDateTime) {
+            int replyID, int isArchieved, Date emailDateTime) {
         this.emailID = emailID;
         this.sender = sender;
         this.receiver = receiver;
@@ -82,19 +82,19 @@ public class Email {
         this.replyID = replyID;
     }
 
-    public boolean isIsArchieved() {
+    public int isIsArchieved() {
         return isArchieved;
     }
 
-    public void setIsArchieved(boolean isArchieved) {
+    public void setIsArchieved(int isArchieved) {
         this.isArchieved = isArchieved;
     }
 
-    public Timestamp getEmailDateTime() {
+    public Date getEmailDateTime() {
         return emailDateTime;
     }
 
-    public void setEmailDateTime(Timestamp emailDateTime) {
+    public void setEmailDateTime(Date emailDateTime) {
         this.emailDateTime = emailDateTime;
     }
     

@@ -66,7 +66,7 @@
         </form>
         <br>
         <!-- For Shrioo -->
-        <form action="forword.jsp" method="post">
+        <form action="fwd_email.jsp" method="post">
             <input type="hidden" name="id" value="<%=email.getEmailID()%>">
             <input type="submit" name="submit" value="Forword">
         </form>

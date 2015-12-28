@@ -5,6 +5,9 @@ import java.io.*;
 import java.sql.*;
 import javax.sql.*;
 import java.sql.DriverManager;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  *
@@ -94,8 +97,8 @@ public class DBAccess {
                 String subject = resultSet.getString("subject");
                 String body = resultSet.getString("body");
                 int replyID = resultSet.getInt("replyID");
-                boolean isArchieved = resultSet.getBoolean("isArchieved");
-                Timestamp emailDateTime = resultSet.getTimestamp("emailDateTime");
+                int isArchieved = resultSet.getInt("isArchieved");
+                Date emailDateTime = resultSet.getDate("emailDateTime");
                 if (replyID == 0) {
                     
                     inbox.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
@@ -123,8 +126,8 @@ public class DBAccess {
                 String subject = resultSet.getString("subject");
                 String body = resultSet.getString("body");
                 int replyID = resultSet.getInt("replyID");
-                boolean isArchieved = resultSet.getBoolean("isArchieved");
-                Timestamp emailDateTime = resultSet.getTimestamp("emailDateTime");
+                int isArchieved = resultSet.getInt("isArchieved");
+                Date emailDateTime = resultSet.getDate("emailDateTime");
                 if (replyID == 0) {
                     archive.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
                 } 
@@ -153,8 +156,8 @@ public class DBAccess {
             String subject = resultSet.getString("subject");
             String body = resultSet.getString("body");
             int replyID = resultSet.getInt("replyID");
-            boolean isArchieved = resultSet.getBoolean("isArchieved");
-            Timestamp emailDateTime = resultSet.getTimestamp("emailDateTime");
+            int isArchieved = resultSet.getInt("isArchieved");
+            Date emailDateTime = resultSet.getDate("emailDateTime");
 
             if (emailID == EmailID) {
                 email = new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime);
@@ -175,13 +178,72 @@ public class DBAccess {
     public int addReply(Email email) throws SQLException {
 
         Statement stmt = con.createStatement();
+        
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        String date = "";
+        date = dateFormat.format(cal.getTime());
+        
         String query = "Insert into email (sender, receiver, subject, body, replyID, isArchieved, emailDateTime)"
                 + " values('" + email.getSender() + "' , '" + email.getReceiver() + "' , '" + email.getSubject() + "' , "
-                + "'" + email.getBody() + "' , " + email.getReplyID() + " , 0 , '2015-12-26 17:18:07')";
+                + "'" + email.getBody() + "' , " + email.getReplyID() +","+ 0 + ",'" + date + "')" ;
 
         int affectedRows = stmt.executeUpdate(query);
         stmt.close();       //release resources
         return affectedRows;
+    }
+    
+    
+    
+    public boolean addNewEmail(Email email) throws SQLException {
+        Statement stmt = con.createStatement();
+        String sender = email.getSender();
+        String receiver = email.getReceiver();
+        String subject = email.getSubject();
+        String body = email.getBody();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        String date = "";
+        date = dateFormat.format(cal.getTime());
+        String query = "INSERT INTO email (sender,receiver,subject,body,replyID,isArchieved,emailDateTime,deleted)"
+                + "values('" + sender + "','" + receiver + "','"
+                + subject + "','" + body + "'," + null + "," + 0 + ",'" + date + "'," + 0 + ")";
+
+        int affectedRows = stmt.executeUpdate(query);
+
+        if (affectedRows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+    
+    
+        public boolean forwardEmail(Email email) throws SQLException {
+        Statement stmt = con.createStatement();
+        String sender = email.getSender();
+        String receiver = email.getReceiver();
+        String subject = email.getSubject();
+        String body = email.getBody();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        String date = "";
+        date = dateFormat.format(cal.getTime());
+        String query = "INSERT INTO email (sender,receiver,subject,body,replyID,isArchieved,emailDateTime,deleted)"
+                + "values('" + sender + "','" + receiver + "','"
+                + subject + "','" + body + "'," + null + "," + 0 + ",'" + date + "'," + 0 + ")";
+
+        int affectedRows = stmt.executeUpdate(query);
+
+        if (affectedRows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
 }

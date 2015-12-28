@@ -7,24 +7,26 @@ package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.System.out;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import model.DBAccess;
 import model.Email;
 
 /**
  *
- * @author Shady
+ * @author Sherif Diab
  */
-@WebServlet(name = "ReplyServlet", urlPatterns = {"/ReplyServlet"})
-public class ReplyServlet extends HttpServlet {
+@WebServlet(name = "NewEmailServlet", urlPatterns = {"/NewEmailServlet"})
+public class NewEmailServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,23 +41,28 @@ public class ReplyServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            
-            int replyID = Integer.parseInt(request.getParameter("basicID"));
-            String sender = request.getParameter("sender");
-            String reciever = request.getParameter("reciever");
+          
+            HttpSession session = request.getSession(true);
+            String receiver = request.getParameter("receiver");
             String subject = request.getParameter("subject");
-            String body = request.getParameter("body");
+            String message = request.getParameter("msg");
+            String sender = session.getAttribute("userEmail").toString();
+            Date date = new Date(System.currentTimeMillis());
+            Email email = new Email(0 , sender , receiver , subject , message , 0 , 0 , date);
             
-            out.print(replyID + " " + sender + " " + reciever + " " + subject + " " + body);
-            
-            Email email = new Email(0, sender, reciever, subject, body, replyID, 0 , null);
             DBAccess dbAccess = new DBAccess();
+           
+            if(dbAccess.addNewEmail(email))
+            { 
+                String url = "/view/pages/inbox.jsp";
+                response.sendRedirect(request.getContextPath() + url);
+                out.println("<script> alert('Your message has been sent'); </script>");
+            }
             
-            dbAccess.addReply(email);
-            dbAccess.closeConnection();
-            
-            String url = "/view/pages/inbox.jsp";
-            response.sendRedirect( request.getContextPath() + url );
+        }catch(Exception ex)
+        {
+            PrintWriter out = response.getWriter();
+            out.println(ex);
         }
     }
 
@@ -74,7 +81,9 @@ public class ReplyServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(ReplyServlet.class.getName()).log(Level.SEVERE, null, ex);
+              PrintWriter out = response.getWriter();
+            out.println(ex);
+            Logger.getLogger(NewEmailServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -92,7 +101,9 @@ public class ReplyServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(ReplyServlet.class.getName()).log(Level.SEVERE, null, ex);
+            PrintWriter out = response.getWriter();
+            out.println(ex);
+            Logger.getLogger(NewEmailServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
