@@ -1,18 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package controller;
-
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import static java.lang.System.out;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.jms.Session;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,8 +23,8 @@ import model.User;
  *
  * @author sabry_ragab
  */
-@WebServlet(name = "SignInServlet", urlPatterns = {"/SignInServlet"})
-public class SignInServlet extends HttpServlet {
+@WebServlet(name = "UpdateDataServlet", urlPatterns = {"/UpdateDataServlet"})
+public class UpdateDataServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,39 +38,47 @@ public class SignInServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-
         try (PrintWriter out = response.getWriter()) {
 
-            String userEmail = request.getParameter("userEmail");
-            String password = request.getParameter("password");
-
-            DBAccess dbAccess = new DBAccess();
-            // Create a session object if it is already not  created.
-            HttpSession session = request.getSession(true);
-             
-            if (dbAccess.isValidUser(userEmail, password) == true) { //correct data
-                
-                
-                session.setAttribute("userEmail", userEmail);
-                session.setMaxInactiveInterval(60*60);// one hour
-                User user = dbAccess.getUser(userEmail);
-                dbAccess.closeConnection();
-                session.setAttribute("user", user);
-                String url = "/view/pages/inbox.jsp";
-                response.sendRedirect(request.getContextPath() + url);
-
-            } else {
-
-                dbAccess.closeConnection();
-                session.setAttribute("signinResult", "Incorrect Email or Password");
-                session.setAttribute("userEmail", userEmail);
-                session.setAttribute("password", password);
+            HttpSession session = request.getSession(false);
+            User user = null;
+            if (session == null) {
+                // Not created yet. Now do so yourself.
                 String url = "/view/pages/signin.jsp";
                 response.sendRedirect(request.getContextPath() + url);
+            } else {
+                // Already created.
+                user = (User) session.getAttribute("user");
 
             }
-        }
 
+            String userEmail = request.getParameter("userEmail");
+            String country = request.getParameter("country");
+            String newPassword = request.getParameter("newPassword");
+            String name = request.getParameter("name");
+            String oldPassword = request.getParameter("oldPassword");
+
+            if (oldPassword.equals(user.getPassword())) {
+                //update session of user
+                user.setCountry(country);
+                user.setName(name);
+                user.setPassword(newPassword);
+                session.setAttribute("user", user);
+                session.setAttribute("updateResult", "Data is updated Successfully");
+                out.print(user.getName());
+
+                //update DB
+                DBAccess dbAccess = new DBAccess();
+                dbAccess.updateUserData(user);
+                dbAccess.closeConnection();
+            } else {
+                 session.setAttribute("updateResult", "Incorrect Old password");
+            }
+
+            String url = "/view/pages/editProfile.jsp";
+            response.sendRedirect(request.getContextPath() + url);
+
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -91,7 +96,7 @@ public class SignInServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(SignInServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UpdateDataServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -109,7 +114,7 @@ public class SignInServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(SignInServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UpdateDataServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -120,7 +125,7 @@ public class SignInServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "This servelt validate sigin Form";
+        return "Short description";
     }// </editor-fold>
 
 }

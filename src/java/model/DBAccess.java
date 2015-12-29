@@ -76,13 +76,11 @@ public class DBAccess {
         ArrayList<Email> archive = new ArrayList<>();
         archive.addAll(getUserArchive(userEmail));
 
-        User user = new User(userEmail, name, password, country,
-                profilePic, inbox, archive);
+        User user = new User(userEmail, name, password, country, (InputStream) profilePic, inbox, archive);
 
         return user;
     }
 
-    
     public ArrayList<Email> getUserInbox(String userEmail) throws SQLException {
         ArrayList<Email> inbox = new ArrayList<Email>();
         Statement stmt = con.createStatement();
@@ -100,7 +98,7 @@ public class DBAccess {
                 int isArchieved = resultSet.getInt("isArchieved");
                 Date emailDateTime = resultSet.getDate("emailDateTime");
                 if (replyID == 0) {
-                    
+
                     inbox.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
                 }
 
@@ -111,7 +109,7 @@ public class DBAccess {
 
         return inbox;
     }
-    
+
     public ArrayList<Email> getUserArchive(String userEmail) throws SQLException {
         ArrayList<Email> archive = new ArrayList<Email>();
         Statement stmt = con.createStatement();
@@ -130,7 +128,7 @@ public class DBAccess {
                 Date emailDateTime = resultSet.getDate("emailDateTime");
                 if (replyID == 0) {
                     archive.add(new Email(emailID, sender, receiver, subject, body, replyID, isArchieved, emailDateTime));
-                } 
+                }
             }
         }
         resultSet.close(); //release resources
@@ -139,12 +137,59 @@ public class DBAccess {
         return archive;
     }
 
-    /************************ BY Shady ****************************/
+    public boolean isExistEmail(String userEmail) throws SQLException {
+        Statement stmt = con.createStatement();
+        ResultSet resultSet = stmt.executeQuery("SELECT * FROM User;");
 
+        while (resultSet.next()) {
+            if (userEmail.equals(resultSet.getString("userEmail"))) {
+                resultSet.close(); //release resources
+                stmt.close(); //release resourcesF
+                return true;
+            }
+        }
+        resultSet.close(); //release resources
+        stmt.close(); //release resources
+        return false;
+    }
+
+    public void addNewUser(User user) throws SQLException {
+        PreparedStatement pre = con.prepareStatement("insert into User values(?,?,?,?,?)");
+        pre.setString(1, user.getUserEmail());
+        pre.setString(2, user.getName());
+        pre.setString(3, user.getPassword());
+        pre.setString(4, user.getCountry());
+        pre.setBinaryStream(5, (InputStream) user.getProfilePic());
+        pre.executeUpdate();
+        pre.close();
+    }
+
+    public void updateUserData(User user) throws SQLException {
+        Statement stmt = con.createStatement();
+        String UQuery = "UPDATE User "
+                + "SET name='" + user.getName() + "', country= '" + user.getCountry()
+                + "', password='" + user.getPassword()
+                + "' WHERE userEmail= '" + user.getUserEmail() + "';";
+
+        stmt.executeUpdate(UQuery);
+    }
+
+    public void updateUserProfile(User user) throws SQLException {
+        Statement stmt = con.createStatement();
+        String UQuery = "UPDATE User "
+                + "SET profilePic='" + user.getProfilePic()
+                + "' WHERE userEmail= '" + user.getUserEmail() + "';";
+
+        stmt.executeUpdate(UQuery);
+    }
+
+    /**
+     * ********************** BY Shady ***************************
+     */
     public Email getEmail(int EmailID) throws SQLException {
 
         Statement stmt = con.createStatement();
-        String query = "SELECT * FROM Email WHERE emailID=" + EmailID + " OR ReplyID=" + EmailID+";";
+        String query = "SELECT * FROM Email WHERE emailID=" + EmailID + " OR ReplyID=" + EmailID + ";";
         Email email = null;
         ArrayList<Email> emailReplies = new ArrayList<Email>();
         ResultSet resultSet = stmt.executeQuery(query);
@@ -178,22 +223,22 @@ public class DBAccess {
     public int addReply(Email email) throws SQLException {
 
         Statement stmt = con.createStatement();
-        
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Calendar cal = Calendar.getInstance();
         String date = "";
         date = dateFormat.format(cal.getTime());
-        
+
         String query = "Insert into email (sender, receiver, subject, body, replyID, isArchieved, emailDateTime)"
                 + " values('" + email.getSender() + "' , '" + email.getReceiver() + "' , '" + email.getSubject() + "' , "
-                + "'" + email.getBody() + "' , " + email.getReplyID() +","+ 0 + ",'" + date + "')" ;
+                + "'" + email.getBody() + "' , " + email.getReplyID() + "," + 0 + ",'" + date + "')";
 
         int affectedRows = stmt.executeUpdate(query);
         stmt.close();       //release resources
         return affectedRows;
     }
-    
-    
+
+    /******************************* By Sherif **************************/
     
     public boolean addNewEmail(Email email) throws SQLException {
         Statement stmt = con.createStatement();
@@ -219,9 +264,8 @@ public class DBAccess {
         }
 
     }
-    
-    
-        public boolean forwardEmail(Email email) throws SQLException {
+
+    public boolean forwardEmail(Email email) throws SQLException {
         Statement stmt = con.createStatement();
         String sender = email.getSender();
         String receiver = email.getReceiver();

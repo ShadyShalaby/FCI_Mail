@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html>
     <head>
@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script src="../js/myscripts.js"></script>
 
     </head>
     <body>
@@ -17,64 +18,77 @@
             <nav class="navbar ">
 
                 <div class="navbar-header">
-                    <a class="navbar-brand bg-primary" href="#">FCI CU Mail</a>
+                    <a class="navbar-brand bg-primary" href="#">FCI Mail</a>
                 </div>
                 <div>
                     <ul class="nav navbar-nav">
-                       <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Sign in </a></li>
+                        <li><a href="signin.jsp"><span class="glyphicon glyphicon-log-in"></span> Sign in </a></li>
+                        <li><a href="../../index.html"> Home Page </a></li>
                     </ul>
                 </div>
 
             </nav>
+            
+             <%
+                String signupResult = "", userEmail = "", country = " ", name = " ";
 
+                if ((String)session.getAttribute("signupResult") != null) {
+                    signupResult = (String) session.getAttribute("signupResult");
+                    userEmail = (String) session.getAttribute("userEmail");
+                    country = (String) session.getAttribute("country");
+                    name = (String) session.getAttribute("name");
+                    session.invalidate();//delete it
+                }
 
+            %>
+           
             <div class="row">
-                <div class="col-md-3"></div>
-                <div class="col-md-3">
-                    <form class="form-signUp">
-                        <h2 class="form-signin-heading" style="color:DodgerBlue">Please sign up</h2>
-                        <div>
-                            <label style="color:DodgerBlue">UserName </label><br>
-                            <input type="text" placeholder="Your UserName">
-                        </div>
+                <div class="col-md-6">
+                    <form class="form-group" method="post"   enctype="multipart/form-data"  action="../../SignUpServlet" 
+                          onsubmit="return validateSignUpForm()">
+                        <h2 class="text-warning">Please sign up</h2>
+       
+                        <label for="inputName" class="text-muted">User Name </label>
+                        <input type="text" id="inputName" name="name"  value="<%= name  %>" class="form-control" required>
+                       
                         
-                        <div>
-                            <label style="color:DodgerBlue">Password </label> <br>
-                            <input type="password" placeholder="Your Password" required>
-                        </div>
+                        <label for="inputPassword" class="text-muted">Password </label> 
+                        <input type="password"  id="inputpassword" name="password" class="form-control" required>
+                       
                         
-                        <div>
-                            <label style="color:DodgerBlue">E-mail </label> <br>
-                            <input type="text" placeholder="Your E-mail">
-                        </div>
+                        <label for="inputUserEmail" class="text-muted">E-mail </label> 
+                        <input type="text"id="inputUserEmail" name="userEmail" value="<%= userEmail  %>" class="form-control"  required>
+                       
                         
-                        <div>
-                            <label style="color:DodgerBlue">Country </label> <br>
-                            <input type="text" placeholder="Your Country">
-                        </div>
+                        <label for="inputCountry" class="text-muted">Country </label> 
+                        <input type="text" id="inputCountry" name="country" value="<%= country  %>" class="form-control" >
+                       
                         
-                        <div>
-                            <label style="color:DodgerBlue">Phone </label> <br>
-                            <input type="text" placeholder="Your phone-No">
-                        </div>
-                        
-                        
-                            <label style="color:DodgerBlue">Profile Picture</label> <br>
-                            <input type="file" name="pic" accept="image/*">
-                        
+                        <label for="inputProfilePic" class="text-muted">Profile Picture</label> 
+                        <input type="file" name="profilePic" id="inputProfilePic"  accept="image/*" class="form-control">
                         
                         
                         <br>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+                        <input id="signup-btn" class="btn btn-lg btn-primary" value="Sign up" type="submit">
                     </form>  
+                    
+                         <% if( !signupResult.equals("") && signupResult != null){
+                        %>
+                    
+                     <div class="alert alert-danger fade in">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>Sorry,</strong> this e-mail is exist.
+                    </div>
+                    
+                    <%}%>
+                    
                 </div>
-                <div class="col-md-3"></div>
+                <div class="col-md-6"></div>
             </div>
-            
+
         </div>
-        
+
     </body>
 </html>
 
-  
+

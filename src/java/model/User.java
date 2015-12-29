@@ -1,5 +1,6 @@
 package model;
 
+import java.io.InputStream;
 import java.sql.Blob;
 import java.util.ArrayList;
 
@@ -14,21 +15,19 @@ public class User {
     private String name;
     private String password;
     private String country;
-    private Blob profilePic; // to be checked
+    private InputStream  profilePic; // change from blob to inputstream ya shady ---> conflict
     private ArrayList<Email> inbox;
     private ArrayList<Email> archive;
 
     public User(String userEmail, String name, String password, String country,
-            Blob profilePic, ArrayList<Email> inbox, ArrayList<Email> archive) {
+            InputStream  profilePic, ArrayList<Email> inbox, ArrayList<Email> archive) {//---> conflict
         this.userEmail = userEmail;
         this.name = name;
         this.password = password;
         this.country = country;
         this.profilePic = profilePic;
-        this.inbox = new ArrayList<>();
-        this.inbox.addAll(inbox);
-        this.archive = new ArrayList<>();
-        this.archive.addAll(archive);
+        this.inbox = inbox;
+        this.archive = archive;
     }
 
     public String getUserEmail() {
@@ -63,11 +62,11 @@ public class User {
         this.country = country;
     }
 
-    public Blob getProfilePic() {
+    public InputStream  getProfilePic() {  //---> conflict
         return profilePic;
     }
 
-    public void setProfilePic(Blob profilePic) {
+    public void setProfilePic(InputStream  profilePic) { //---> conflict
         this.profilePic = profilePic;
     }
 
@@ -76,8 +75,7 @@ public class User {
     }
 
     public void setInbox(ArrayList<Email> inbox) {
-        this.inbox = new ArrayList<>();
-        this.inbox.addAll(inbox);
+        this.inbox = inbox;
     }
 
     public ArrayList<Email> getArchive() {
@@ -85,8 +83,7 @@ public class User {
     }
 
     public void setArchive(ArrayList<Email> archive) {
-        this.archive = new ArrayList<>();
-        this.archive.addAll(archive);
+        this.archive = archive;
     }
 
 }
